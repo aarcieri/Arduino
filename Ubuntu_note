@@ -1,0 +1,22 @@
+Avvio:
+   sudo ./arduino
+    
+
+ -> errore
+
+          Arduino:1.8.16 (Linux), Scheda:"Arduino/Genuino 101"
+
+          fork/exec /root/.arduino15/packages/Intel/tools/arc-elf32/1.6.9+1.0.1/bin/arc-elf32-g++: no such file or directory
+           Errore durante la compilazione per la scheda Arduino/Genuino 101.
+           
+-> soluzione
+  
+  Disinstallare: 
+      sudo ./uninstall.sh
+      
+  rimuovere la dir: 
+      cd ~
+      rm .arduino15/ -r
+      
+ installare nuovamente: 
+      sudo ./install.sh
