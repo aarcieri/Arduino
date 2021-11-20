@@ -2,7 +2,7 @@
 #define _TIMED_TASK_H_
 
 // uncomment to debug using CodeBlocks
-#define _JUST_DEBUG_   // flag to debug outside Arduino
+//#define _JUST_DEBUG_   // flag to debug outside Arduino
 
 
 #ifndef _JUST_DEBUG_
