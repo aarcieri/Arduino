@@ -20,13 +20,13 @@
 
 typedef int (*Callback_t)(void *); // puntatore alla funzione di callback
 
-typedef unsigned int Millisecs;
+typedef unsigned long Millisecs;
 
 typedef struct st_task {
         Callback_t handler; // task handler callback func
         void* arguments;     // argument given to the callback handler
-        unsigned int  expires;
-        unsigned long elapsed;
+        Millisecs start;
+        Millisecs expires;
 } Task;
 
 

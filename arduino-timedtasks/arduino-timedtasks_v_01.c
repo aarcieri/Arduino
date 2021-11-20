@@ -9,7 +9,7 @@
 
     #include <sys/time.h>
 
-    #define MAX_VALUE_TIMER 20
+    #define MAX_VALUE_TIMER 4
 
     //return millisec elapsed from first call
     unsigned int millis_now()
@@ -51,6 +51,7 @@ Task* getTask(int index)
         init=1;
         for(int i=0; i<MAX_TASKS; i++)
         {
+            tasks[i].start = 0;
             tasks[i].handler=NULL;
         }
     }
@@ -84,8 +85,8 @@ short add_task(Millisecs expires, Callback_t handler, void* args )
         Task* t = getTask(index);
         t->arguments = args;
         t->handler   = handler;
+        t->start     = millis_now();
         t->expires   = expires;
-        t->elapsed   = 0;
 
         return 1;
     }
@@ -109,56 +110,40 @@ void remove_task(Callback_t handler)
 }
 
 
-unsigned long delta(unsigned int timeNow, unsigned long lastStart)
-{
-    unsigned long delta;
-
-    if(timeNow < lastStart)
-    {
-        delta = ((unsigned long)UINT_MAX-lastStart) + timeNow;
-        #ifdef _JUST_DEBUG_
-        delta =((unsigned long)MAX_VALUE_TIMER*1000-lastStart) + timeNow;
-        #endif // _JUST_DEBUG_
-    }else
-    {
-        delta = timeNow - lastStart;
-    }
-
-    return delta;
-}
-
 void tick()
 {
-    static unsigned long lastStart=0;
     Task* task;
     unsigned int timeNow;
-    unsigned long d; // tempo trascorso tra 2 chiamate successive a tick
-
-    timeNow = millis_now();
-
-    if(lastStart==0) lastStart=timeNow;
-
-    d = delta(timeNow, lastStart);
+    unsigned long duration;
 
     for(int i=0; i<MAX_TASKS; i++)
     {
-
         task = getTask(i);
-        task->elapsed += d;
 
-        if(task->handler!=NULL && task->elapsed >= task->expires)
+        if(task->handler!=NULL)
         {
-            short result = task->handler(task->arguments);
+            timeNow = millis_now();
 
-            if(!result) deleteTask(i);
-            else
+            duration = timeNow - task->start;
+
+            if(timeNow < task->start) // si verifica quando si va oltre il tempo massimo (circa 50 giorni su Arduino)
             {
-                task->elapsed = 0;
+                duration = ((unsigned long)UINT_MAX-task->start) + timeNow;
+                #ifdef _JUST_DEBUG_
+                duration =((unsigned long)MAX_VALUE_TIMER*1000-task->start) + timeNow;
+                //printf("\n Task=%ld -- timeNow=%ld-- start=%ld duration=%ld expires=%ld", i, timeNow, task->start, duration, task->expires);
+                #endif // _JUST_DEBUG_
+            }
+
+            if (duration >= task->expires)
+            {
+                short result = task->handler(task->arguments);
+
+                if(!result) deleteTask(i);
+                else task->start = timeNow;
             }
         }
     }
-
-    lastStart=timeNow;
 }
 
 
