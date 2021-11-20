@@ -1,12 +1,19 @@
 #ifndef _TIMED_TASK_H_
 #define _TIMED_TASK_H_
 
+// uncomment to debug using CodeBlocks
+#define _JUST_DEBUG_   // flag to debug outside Arduino
+
+
+#ifndef _JUST_DEBUG_
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
 #else
 #include <WProgram.h>
 #endif
 
+#endif // _JUST_DEBUG_
 #define MAX_TASKS 10
 
 
